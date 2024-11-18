@@ -20,5 +20,5 @@ import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
   styles: ``,
 })
 export class NavBarComponent {
-  siteName = signal('Applied Angular Training');
+  siteName = signal('Applied Angular Training Course');
 }
