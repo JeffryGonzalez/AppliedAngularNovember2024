@@ -1,10 +1,12 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { NavLinkComponent } from './components/nav-link.component';
+import { NavLinkModel } from './types';
 
 @Component({
   selector: 'app-nav-bar',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [],
+  imports: [NavLinkComponent],
   template: `
     <div class="navbar bg-base-100">
       <div class="flex-1">
@@ -12,7 +14,9 @@ import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
       </div>
       <div class="flex-none">
         <ul class="menu menu-horizontal px-1">
-          <li><a>Link</a></li>
+          @for (link of links(); track link.text) {
+            <li><app-link [link]="link" /></li>
+          }
         </ul>
       </div>
     </div>
@@ -21,4 +25,15 @@ import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 })
 export class NavBarComponent {
   siteName = signal('Applied Angular Training Course');
+
+  links = signal<NavLinkModel[]>([
+    {
+      text: 'Home',
+      path: 'home',
+    },
+    {
+      text: 'About Us',
+      path: 'about',
+    },
+  ]);
 }
