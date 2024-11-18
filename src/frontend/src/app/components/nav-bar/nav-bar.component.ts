@@ -23,7 +23,9 @@ import { Title } from '@angular/platform-browser';
       <div class="flex-none">
         <ul class="menu menu-horizontal px-1">
           @for (link of links(); track link.text) {
-            <li><app-link [link]="link" /></li>
+            <li>
+              <app-link [link]="link" (navigated)="onNavigation($event)" />
+            </li>
           }
         </ul>
       </div>
@@ -33,7 +35,7 @@ import { Title } from '@angular/platform-browser';
 })
 export class NavBarComponent implements OnInit {
   #titleService = inject(Title);
-  siteName = signal('Applied Angular Training Course');
+  siteName = signal('Applied Angular');
 
   ngOnInit(): void {
     this.#titleService.setTitle(this.siteName());
@@ -48,4 +50,8 @@ export class NavBarComponent implements OnInit {
       path: 'about',
     },
   ]);
+
+  onNavigation(item: NavLinkModel) {
+    this.#titleService.setTitle(`${this.siteName()} | ${item.text}`);
+  }
 }
