@@ -6,3 +6,5 @@ export type PeopleGiftListModelItem = {
 };
 
 export type PeopleEntity = Omit<PeopleGiftListModelItem, 'ideas'>;
+
+export type PeopleCreate = Omit<PeopleEntity, 'id'>;
