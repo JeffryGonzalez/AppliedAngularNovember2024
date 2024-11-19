@@ -8,6 +8,7 @@ import { RouterLink, RouterOutlet } from '@angular/router';
   template: `
     <div>
       <a class="link" routerLink="people">People</a>
+      <a class="link" routerLink="people-entry">Add A Person To Your List</a>
     </div>
 
     <router-outlet />
