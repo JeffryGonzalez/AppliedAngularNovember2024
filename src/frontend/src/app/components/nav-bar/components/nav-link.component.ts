@@ -6,15 +6,25 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NavLinkModel } from '../types';
+import { FeatureDirective } from '../../../shared/feature-management/feature.directive';
 
 @Component({
   selector: 'app-link',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
+  imports: [RouterLink, FeatureDirective],
   template: `
-    <a (click)="navigated.emit(link())" [routerLink]="[link().path]">{{
-      link().text
-    }}</a>
+    @if (link().featureGated) {
+      <a
+        *feature="link().featureGated ?? ''"
+        (click)="navigated.emit(link())"
+        [routerLink]="[link().path]"
+        >{{ link().text }}</a
+      >
+    } @else {
+      <a (click)="navigated.emit(link())" [routerLink]="[link().path]">{{
+        link().text
+      }}</a>
+    }
   `,
   styles: ``,
 })
