@@ -1,6 +1,11 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { PeopleStore } from '../services/people.store';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { PeopleCreate } from '../types';
 
 @Component({
@@ -20,7 +25,20 @@ import { PeopleCreate } from '../types';
             placeholder="Type here"
             class="input input-bordered w-full max-w-xs"
           />
-          <div class="label"></div>
+          @let nameField = form.controls.name;
+          @if (nameField.invalid && (nameField.touched || nameField.dirty)) {
+            <div class="alert alert-error">
+              @if (nameField.hasError('required')) {
+                <p>We need a name</p>
+              }
+              @if (nameField.hasError('minlength')) {
+                <p>That is too short</p>
+              }
+              @if (nameField.hasError('maxlength')) {
+                <p>That is too long</p>
+              }
+            </div>
+          }
         </label>
       </div>
       <div class="form-control w-1/3">
@@ -45,15 +63,26 @@ export class PeopleEntryComponent {
   store = inject(PeopleStore);
 
   form = new FormGroup({
-    name: new FormControl<string>('', { nonNullable: true }),
+    name: new FormControl<string>('', {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(50),
+      ],
+    }),
     needsMailing: new FormControl<boolean>(false, { nonNullable: true }),
   });
 
   addPerson() {
-    const request: PeopleCreate = {
-      name: this.form.controls.name.value,
-      location: this.form.controls.needsMailing.value ? 'remote' : 'local',
-    };
-    this.store.addPerson(request);
+    this.form.markAllAsTouched();
+    if (this.form.valid) {
+      const request: PeopleCreate = {
+        name: this.form.controls.name.value,
+        location: this.form.controls.needsMailing.value ? 'remote' : 'local',
+      };
+      this.store.addPerson(request);
+      this.form.reset();
+    }
   }
 }

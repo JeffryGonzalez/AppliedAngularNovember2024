@@ -1,19 +1,15 @@
 import { TitleCasePipe } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
-import { PeopleGiftListModelItem } from '../types';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { StatusBarComponent } from '../components/status-bar.component';
 import { PeopleStore } from '../services/people.store';
 
 @Component({
   selector: 'app-gifts-people',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TitleCasePipe],
+  imports: [TitleCasePipe, StatusBarComponent],
   providers: [],
   template: `
+    <app-gifts-status-bar />
     <div class="grid">
       @for (p of store.entities(); track p.id) {
         <div class="card bg-base-100 w-96 shadow-xl">

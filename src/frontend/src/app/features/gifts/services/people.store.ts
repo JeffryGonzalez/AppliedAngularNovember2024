@@ -1,7 +1,13 @@
-import { patchState, signalStore, withMethods } from '@ngrx/signals';
+import {
+  patchState,
+  signalStore,
+  withComputed,
+  withMethods,
+} from '@ngrx/signals';
 import { addEntity, withEntities } from '@ngrx/signals/entities';
 import { PeopleCreate, PeopleEntity } from '../types';
 import { withDevtools } from '@angular-architects/ngrx-toolkit';
+import { computed } from '@angular/core';
 
 export const PeopleStore = signalStore(
   withDevtools('people-store'),
@@ -16,6 +22,18 @@ export const PeopleStore = signalStore(
         };
         patchState(store, addEntity(entity));
       },
+    };
+  }),
+  withComputed((store) => {
+    return {
+      totalPeople: computed(() => store.entities().length),
+      hasPeople: computed(() => store.entities().length > 0),
+      totalLocal: computed(
+        () => store.entities().filter((p) => p.location === 'local').length,
+      ),
+      totalRemote: computed(
+        () => store.entities().filter((p) => p.location === 'remote').length,
+      ),
     };
   }),
 );
