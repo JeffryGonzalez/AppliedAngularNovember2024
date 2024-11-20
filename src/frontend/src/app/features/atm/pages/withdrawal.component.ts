@@ -7,11 +7,12 @@ import {
 } from '@angular/core';
 import { WITHDRAWAL_AMOUNTS, WithdrawAmount } from '../types';
 import { AtmStore } from '../services/atm.store';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-atm-withdrawal',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, RouterLink],
   template: `
     <p>Your Balance is {{ store.balance() | currency }}</p>
     <div class="grid grid-flow-col gap-8">
@@ -25,6 +26,12 @@ import { AtmStore } from '../services/atm.store';
         </button>
       }
     </div>
+
+    @if (store.atBalanceThreshold()) {
+      <a class="btn btn-warning" routerLink="../deposit"
+        >Low Balance - Make a Deposit</a
+      >
+    }
   `,
   styles: ``,
 })

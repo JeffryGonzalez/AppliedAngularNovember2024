@@ -1,5 +1,12 @@
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
+import {
+  patchState,
+  signalStore,
+  withComputed,
+  withMethods,
+  withState,
+} from '@ngrx/signals';
 import { WITHDRAWAL_AMOUNTS, WithdrawAmount } from '../types';
+import { computed } from '@angular/core';
 
 export const AtmStore = signalStore(
   withState({
@@ -11,6 +18,11 @@ export const AtmStore = signalStore(
       withdraw(amount: WithdrawAmount) {
         patchState(store, { balance: store.balance() - amount });
       },
+    };
+  }),
+  withComputed((store) => {
+    return {
+      atBalanceThreshold: computed(() => store.balance() < 50),
     };
   }),
 );
