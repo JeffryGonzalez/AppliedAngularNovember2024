@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, resource } from '@angular/core';
 import { FeatureDirective } from '../shared/feature-management/feature.directive';
 
 @Component({
@@ -12,8 +12,12 @@ import { FeatureDirective } from '../shared/feature-management/feature.directive
         <h2>How is the home page coming!</h2>
       </div>
     }
-    <h1>Below</h1>
+    <h1>Below Stuff</h1>
   `,
   styles: ``,
 })
-export class HomeComponent {}
+export class HomeComponent {
+  peopleResource = resource({
+    loader: () => fetch('/api/user/gifts').then((r) => r.json()),
+  });
+}

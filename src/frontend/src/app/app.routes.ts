@@ -23,6 +23,11 @@ export const routes: Routes = [
       import('./features/atm/atm.routes').then((r) => r.ATM_ROUTES),
   },
   {
+    path: 'counter',
+    loadChildren: () =>
+      import('./features/counter/counter.routes').then((r) => r.COUNTER_ROUTES),
+  },
+  {
     path: '**',
     redirectTo: 'home',
   },
