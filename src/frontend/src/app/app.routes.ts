@@ -17,6 +17,12 @@ export const routes: Routes = [
       import('./features/gifts/gifts.routes').then((r) => r.GIFT_ROUTES),
   },
   {
+    path: 'atm',
+    canMatch: [canMatchFeature('atm')],
+    loadChildren: () =>
+      import('./features/atm/atm.routes').then((r) => r.ATM_ROUTES),
+  },
+  {
     path: '**',
     redirectTo: 'home',
   },
