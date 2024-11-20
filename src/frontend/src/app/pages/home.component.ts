@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, Component, resource } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { GiftDataService } from '../features/gifts/services/gift-data.service';
 import { FeatureDirective } from '../shared/feature-management/feature.directive';
 
 @Component({
   selector: 'app-home',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FeatureDirective],
+  providers: [GiftDataService],
   template: `
     <h1>Above</h1>
     @defer {
@@ -17,7 +19,7 @@ import { FeatureDirective } from '../shared/feature-management/feature.directive
   styles: ``,
 })
 export class HomeComponent {
-  peopleResource = resource({
-    loader: () => fetch('/api/user/gifts').then((r) => r.json()),
-  });
+  service = inject(GiftDataService);
+
+  people$ = this.service.getPeople();
 }
