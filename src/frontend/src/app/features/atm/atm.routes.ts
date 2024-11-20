@@ -1,11 +1,13 @@
 import { Routes } from '@angular/router';
 import { AtmComponent } from './atm.component';
-import { WithdrawalComponent } from './pages/withdrawal.component';
+import { DepositComponent } from './pages/deposit.component';
+import { AtmStore } from './services/atm.store';
 
 export const ATM_ROUTES: Routes = [
   {
     path: '',
     component: AtmComponent,
+    providers: [AtmStore],
     children: [
       {
         path: 'withdrawal',
@@ -13,6 +15,10 @@ export const ATM_ROUTES: Routes = [
           import('./pages/withdrawal.component').then(
             (c) => c.WithdrawalComponent,
           ),
+      },
+      {
+        path: 'deposit',
+        component: DepositComponent,
       },
     ],
   },
