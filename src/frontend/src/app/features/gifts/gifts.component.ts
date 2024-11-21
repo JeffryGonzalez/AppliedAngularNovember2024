@@ -1,13 +1,15 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { PeopleStore } from './services/people.store';
+import { StatusBarComponent } from './components/status-bar.component';
 
 @Component({
   selector: 'app-gifts',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, RouterLink],
+  imports: [RouterOutlet, RouterLink, StatusBarComponent],
   template: `
     @if (store.isFulfilled()) {
+      <app-gifts-status-bar />
       <div class="flex gap-8">
         <a class="link" routerLink="people">People</a>
         <a class="link" routerLink="people-entry">Add A Person To Your List</a>

@@ -3,26 +3,28 @@ import { computed, inject } from '@angular/core';
 import {
   patchState,
   signalStore,
+  type,
   withComputed,
   withHooks,
   withMethods,
 } from '@ngrx/signals';
 import {
-  addEntities,
   addEntity,
+  removeEntity,
   setEntities,
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { setFulfilled, withRequestStatus, setPending } from '@shared/index';
-import { mergeMap, pipe, switchMap, tap } from 'rxjs';
+import { setFulfilled, setPending, withRequestStatus } from '@shared/index';
+import { map, mergeMap, pipe, switchMap, tap } from 'rxjs';
 import { PeopleCreate, PeopleEntity } from '../types';
-import { GiftDataService } from './gift-data.service';
+import { GiftDataService, PersonItem } from './gift-data.service';
 
 export const PeopleStore = signalStore(
   withDevtools('people-store'),
   withRequestStatus(),
-  withEntities<PeopleEntity>(),
+  withEntities({ collection: '_serverPeople', entity: type<PersonItem>() }),
+  withEntities({ collection: '_tempPeople', entity: type<PersonItem>() }),
   withMethods((store) => {
     // injection context
     const service = inject(GiftDataService);
@@ -35,20 +37,45 @@ export const PeopleStore = signalStore(
             service
               .getPeople()
               .pipe(
-                tap((d) => patchState(store, setEntities(d), setFulfilled())),
+                tap((d) =>
+                  patchState(
+                    store,
+                    setEntities(d, { collection: '_serverPeople' }),
+                    setFulfilled(),
+                  ),
+                ),
               ),
           ),
         ),
       ),
       addPerson: rxMethod<PeopleCreate>(
         pipe(
-          tap(() => patchState(store, setPending())),
-          mergeMap((p) =>
-            service
-              .addPerson(p)
-              .pipe(
-                tap((p) => patchState(store, addEntity(p), setFulfilled())),
+          map((p) => {
+            const tempPerson: PersonItem = {
+              id: crypto.randomUUID(),
+              name: p.name,
+              isLocal: p.location === 'local',
+            };
+
+            patchState(
+              store,
+              addEntity(tempPerson, { collection: '_tempPeople' }),
+            );
+            return [p, tempPerson.id] as [PeopleCreate, string];
+          }),
+
+          mergeMap(([p, tempId]) =>
+            service.addPerson(p, tempId).pipe(
+              tap((result) =>
+                patchState(
+                  store,
+                  addEntity(result.person, { collection: '_serverPeople' }),
+                  removeEntity(result.temporaryId, {
+                    collection: '_tempPeople',
+                  }),
+                ),
               ),
+            ),
           ),
         ),
       ),
@@ -57,14 +84,41 @@ export const PeopleStore = signalStore(
 
   withComputed((store) => {
     return {
-      totalPeople: computed(() => store.entities().length),
-      hasPeople: computed(() => store.entities().length > 0),
+      entities: computed(() => {
+        const serverPeople = store._serverPeopleEntities().map(
+          (p) =>
+            ({
+              id: p.id,
+              name: p.name,
+              location: p.isLocal ? 'local' : 'remote',
+              isPending: false,
+            }) as PeopleEntity,
+        );
+
+        const tempPeople = store._tempPeopleEntities().map(
+          (p) =>
+            ({
+              id: p.id,
+              name: p.name,
+              location: p.isLocal ? 'local' : 'remote',
+              isPending: true,
+            }) as PeopleEntity,
+        );
+
+        return [...serverPeople, ...tempPeople];
+      }),
+      totalPeople: computed(() => store._serverPeopleEntities().length),
+      hasPeople: computed(() => 1),
       totalLocal: computed(
-        () => store.entities().filter((p) => p.location === 'local').length,
+        () => store._serverPeopleEntities().filter((s) => s.isLocal).length,
       ),
+
       totalRemote: computed(
-        () => store.entities().filter((p) => p.location === 'remote').length,
+        () =>
+          store._serverPeopleEntities().filter((s) => s.isLocal === false)
+            .length,
       ),
+      totalPending: computed(() => store._tempPeopleIds().length),
     };
   }),
   withHooks({
@@ -73,3 +127,5 @@ export const PeopleStore = signalStore(
     },
   }),
 );
+
+// function mapApiPersontoEntity()

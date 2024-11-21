@@ -19,6 +19,10 @@ import { PeopleStore } from '../services/people.store';
         People On Your List that are Remote
         <div class="badge badge-secondary">{{ store.totalRemote() }}</div>
       </div>
+      <div>
+        Pending People
+        <div class="badge badge-secondary">{{ store.totalPending() }}</div>
+      </div>
     }
   `,
   styles: ``,

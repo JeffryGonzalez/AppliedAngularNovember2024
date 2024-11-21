@@ -5,6 +5,8 @@ export type PeopleGiftListModelItem = {
   ideas: { id: string; description: string }[];
 };
 
-export type PeopleEntity = Omit<PeopleGiftListModelItem, 'ideas'>;
+export type PeopleEntity = Omit<PeopleGiftListModelItem, 'ideas'> & {
+  isPending: boolean;
+};
 
-export type PeopleCreate = Omit<PeopleEntity, 'id'>;
+export type PeopleCreate = Omit<PeopleEntity, 'id' | 'isPending'>;
