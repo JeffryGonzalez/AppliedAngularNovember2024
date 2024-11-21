@@ -1,20 +1,34 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { PeopleEntity } from '../types';
+import { PeopleCreate, PeopleEntity } from '../types';
 
 export type ApiResult = {
-  people: Array<{
-    id: string;
-    name: string;
-    isLocal: boolean;
-  }>;
+  people: PersonItem[];
+};
+type PersonItem = {
+  id: string;
+  name: string;
+  isLocal: boolean;
 };
 
 @Injectable()
 export class GiftDataService {
   #http = inject(HttpClient);
 
+  addPerson(person: PeopleCreate): Observable<PeopleEntity> {
+    return this.#http
+      .post<PersonItem>('/api/user/people', person)
+      .pipe(
+        map(
+          (r) =>
+            ({
+              ...r,
+              location: r.isLocal ? 'local' : 'remote',
+            }) as PeopleEntity,
+        ),
+      );
+  }
   getPeople(): Observable<PeopleEntity[]> {
     return this.#http.get<ApiResult>('/api/user/gifts').pipe(
       map((r) => r.people), // ApiResult -> {id: string, name: string, isLocal: boolean}[]

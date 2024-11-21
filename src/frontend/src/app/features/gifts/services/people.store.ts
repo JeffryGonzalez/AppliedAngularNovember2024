@@ -40,15 +40,21 @@ export const PeopleStore = signalStore(
           ),
         ),
       ),
-      addPerson: (request: PeopleCreate) => {
-        const entity: PeopleEntity = {
-          id: crypto.randomUUID(),
-          ...request,
-        };
-        patchState(store, addEntity(entity));
-      },
+      addPerson: rxMethod<PeopleCreate>(
+        pipe(
+          tap(() => patchState(store, setPending())),
+          mergeMap((p) =>
+            service
+              .addPerson(p)
+              .pipe(
+                tap((p) => patchState(store, addEntity(p), setFulfilled())),
+              ),
+          ),
+        ),
+      ),
     };
   }),
+
   withComputed((store) => {
     return {
       totalPeople: computed(() => store.entities().length),

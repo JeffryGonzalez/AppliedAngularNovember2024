@@ -30,8 +30,8 @@ const handlers = [
     return HttpResponse.json(person);
   }),
 
-  http.post('/api/users/people', async ({ request }) => {
-    await delay(fakeDelay);
+  http.post('/api/user/people', async ({ request }) => {
+    await delay(8000);
     const body = (await request.json()) as unknown as {
       name: string;
       isLocal: boolean;
