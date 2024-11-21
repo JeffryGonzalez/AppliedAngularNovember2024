@@ -1,3 +1,5 @@
+import { withDevtools } from '@angular-architects/ngrx-toolkit';
+import { computed, inject } from '@angular/core';
 import {
   patchState,
   signalStore,
@@ -5,27 +7,36 @@ import {
   withHooks,
   withMethods,
 } from '@ngrx/signals';
-import { addEntity, setEntities, withEntities } from '@ngrx/signals/entities';
-import { PeopleCreate, PeopleEntity } from '../types';
-import { withDevtools } from '@angular-architects/ngrx-toolkit';
-import { computed, inject } from '@angular/core';
+import {
+  addEntities,
+  addEntity,
+  setEntities,
+  withEntities,
+} from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap } from 'rxjs';
+import { setFulfilled, withRequestStatus, setPending } from '@shared/index';
+import { mergeMap, pipe, switchMap, tap } from 'rxjs';
+import { PeopleCreate, PeopleEntity } from '../types';
 import { GiftDataService } from './gift-data.service';
 
 export const PeopleStore = signalStore(
   withDevtools('people-store'),
+  withRequestStatus(),
   withEntities<PeopleEntity>(),
   withMethods((store) => {
     // injection context
     const service = inject(GiftDataService);
     return {
-      _load: rxMethod<void>(
+      load: rxMethod<void>(
         pipe(
+          tap(() => patchState(store, setPending())),
           switchMap(() =>
+            // I only care about the last result. Throw any previous pending results away.
             service
               .getPeople()
-              .pipe(tap((d) => patchState(store, setEntities(d)))),
+              .pipe(
+                tap((d) => patchState(store, setEntities(d), setFulfilled())),
+              ),
           ),
         ),
       ),
@@ -52,7 +63,7 @@ export const PeopleStore = signalStore(
   }),
   withHooks({
     onInit(store) {
-      store._load();
+      store.load();
     },
   }),
 );

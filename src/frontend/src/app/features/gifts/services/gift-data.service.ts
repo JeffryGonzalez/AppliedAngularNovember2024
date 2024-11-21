@@ -17,7 +17,7 @@ export class GiftDataService {
 
   getPeople(): Observable<PeopleEntity[]> {
     return this.#http.get<ApiResult>('/api/user/gifts').pipe(
-      map((r) => r.people),
+      map((r) => r.people), // ApiResult -> {id: string, name: string, isLocal: boolean}[]
       map((people) => {
         return people.map((person) => {
           const transformed: PeopleEntity = {

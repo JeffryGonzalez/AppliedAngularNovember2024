@@ -1,5 +1,5 @@
 import { http, HttpResponse, delay } from 'msw';
-const fakeDelay = 1;
+const fakeDelay = 2000;
 const testPeople = [
   {
     id: '99',
