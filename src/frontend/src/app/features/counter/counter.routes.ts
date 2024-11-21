@@ -3,6 +3,7 @@ import { CounterComponent } from './counter.component';
 import { UiComponent } from './pages/ui.component';
 import { PrefsComponent } from './pages/prefs.component';
 import { CounterStore } from './services/counter.store';
+import { PeopleStore } from '../gifts/services/people.store';
 
 export const COUNTER_ROUTES: Routes = [
   {
